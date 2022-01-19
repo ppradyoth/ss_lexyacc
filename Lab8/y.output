@@ -1,0 +1,86 @@
+   0  $accept : ident $end
+
+   1  ident : ALPHA alphanum
+
+   2  alphanum : ALPHA
+   3           | NUM
+   4           | ALPHA alphanum
+   5           | NUM alphanum
+   6           |
+
+state 0
+	$accept : . ident $end  (0)
+
+	ALPHA  shift 1
+	.  error
+
+	ident  goto 2
+
+
+state 1
+	ident : ALPHA . alphanum  (1)
+	alphanum : .  (6)
+
+	ALPHA  shift 3
+	NUM  shift 4
+	$end  reduce 6
+
+	alphanum  goto 5
+
+
+state 2
+	$accept : ident . $end  (0)
+
+	$end  accept
+
+
+3: reduce/reduce conflict (reduce 2, reduce 6) on $end
+state 3
+	alphanum : ALPHA .  (2)
+	alphanum : ALPHA . alphanum  (4)
+	alphanum : .  (6)
+
+	ALPHA  shift 3
+	NUM  shift 4
+	$end  reduce 2
+
+	alphanum  goto 6
+
+
+4: reduce/reduce conflict (reduce 3, reduce 6) on $end
+state 4
+	alphanum : NUM .  (3)
+	alphanum : NUM . alphanum  (5)
+	alphanum : .  (6)
+
+	ALPHA  shift 3
+	NUM  shift 4
+	$end  reduce 3
+
+	alphanum  goto 7
+
+
+state 5
+	ident : ALPHA alphanum .  (1)
+
+	.  reduce 1
+
+
+state 6
+	alphanum : ALPHA alphanum .  (4)
+
+	.  reduce 4
+
+
+state 7
+	alphanum : NUM alphanum .  (5)
+
+	.  reduce 5
+
+
+State 3 contains 1 reduce/reduce conflict.
+State 4 contains 1 reduce/reduce conflict.
+
+
+5 terminals, 3 nonterminals
+7 grammar rules, 8 states
